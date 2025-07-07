@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>PI FastBot Web</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #0d1117;
+      color: #c9d1d9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .container {
+      background: #161b22;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px #00f0ff33;
+      width: 90%;
+      max-width: 500px;
+    }
+    h1 {
+      color: #58a6ff;
+      text-align: center;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+    }
+    input {
+      background: #0d1117;
+      color: #fff;
+      border: 1px solid #30363d;
+    }
+    button {
+      background: #238636;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #2ea043;
+    }
+    #status {
+      margin-top: 15px;
+      color: #ffa657;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚙️ Konfigurasi FastBot</h1>
+    <input id="mnemonic" placeholder="24 Kata Mnemonic">
+    <input id="receiver" placeholder="Alamat Wallet Tujuan">
+    <input id="startTime" type="datetime-local">
+    <button onclick="saveConfig()">💾 Simpan</button>
+    <button onclick="startBot()">🚀 Mulai Bot</button>
+    <p id="status"></p>
+  </div>
+  <script>
+    async function saveConfig() {
+      const mnemonic = document.getElementById('mnemonic').value;
+      const receiver = document.getElementById('receiver').value;
+      const startTime = document.getElementById('startTime').value;
+
+      const res = await fetch('/save-config', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ mnemonic, receiver, startTime })
+      });
+
+      const msg = await res.text();
+      document.getElementById('status').innerText = msg;
+    }
+
+    async function startBot() {
+      const res = await fetch('/start-bot');
+      const msg = await res.text();
+      document.getElementById('status').innerText = msg;
+    }
+
+    window.onload = async () => {
+      const res = await fetch('/get-config');
+      const cfg = await res.json();
+      document.getElementById('mnemonic').value = cfg.mnemonic;
+      document.getElementById('receiver').value = cfg.receiver;
+      document.getElementById('startTime').value = cfg.startTime;
+    };
+  </script>
+</body>
+</html>
